@@ -95,7 +95,6 @@ class TestViews(test.TestCase):
         data.update(md5='*****')
         resp = self.client.post(self.url, data=data)
         self.assertEquals(400, resp.status_code)
-        self.assertIn('failed', resp.content)
 
     def test_pay_form_valid(self):
         data = self.get_pay_data()
