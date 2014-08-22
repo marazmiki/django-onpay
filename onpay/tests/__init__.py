@@ -5,7 +5,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
 from django import test
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse
 from django.utils import six
 from django.utils.timezone import now
 from onpay.utils import create_order
@@ -33,7 +33,7 @@ class TestViews(test.TestCase):
                                   comment='Test order',
                                   email='bender@ilovebender.com')
         self.client = test.Client()
-        self.url = reverse_lazy('onpay_result')
+        self.url = reverse('onpay_result')
 
     def get_check_data(self):
         return {
