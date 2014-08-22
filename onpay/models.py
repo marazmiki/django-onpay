@@ -112,7 +112,7 @@ class Order(models.Model):
 
     def crc_pay_correct(self, crc, onpay_id, order_amount):
         actual_crc = self.crc_pay_get(onpay_id, order_amount)
-        print("expected crc: %s, actual: %s" % (crc, actual_crc))
+        #print("expected crc: %s, actual: %s" % (crc, actual_crc))
         return crc == actual_crc
 
     def crc_pay_get(self, onpay_id, order_amount):
@@ -122,7 +122,7 @@ class Order(models.Model):
             order_amount=order_amount,
             currency=settings.ONPAY_CURRENCY,
             secret=settings.ONPAY_SECRET)
-        print('crc get =',md5source)
+        #print('crc get =',md5source)
         md5hash = hashlib.md5(md5source).hexdigest().upper()
         return md5hash
 
