@@ -36,27 +36,31 @@ class TestViews(test.TestCase):
         self.url = reverse_lazy('onpay_result')
 
     def get_check_data(self):
-        return {'type': 'check',
-                'md5': CRC_CHECK_CORRECT,
-                'order_currency': self.order.currency,
-                'order_amount': 1.0,
-                'amount': 1.0,
-                'pay_for': self.order.pk}
+        return {
+            'type': 'check',
+            'md5': CRC_CHECK_CORRECT,
+            'order_currency': self.order.currency,
+            'order_amount': 1.0,
+            'amount': 1.0,
+            'pay_for': self.order.pk
+        }
 
     def get_pay_data(self):
-        return {'type': 'pay',
-                'md5': CRC_CHECK_CORRECT,
-                'order_currency': self.order.currency,
-                'order_amount': 1.0,
-                'amount': 1.0,
-                'pay_for': self.order.pk,
-                'balance_amount': 1.0,
-                'paid_amount': 1.0,
-                'paymentDateTime': now().isoformat(),
-                'onpay_id': ONPAY_ID,
-                'balance_currency': self.order.currency,
-                'exchange_rate': 1,
-                'user_email': 'bender@ilovebender.com'}
+        return {
+            'type': 'pay',
+            'md5': CRC_CHECK_CORRECT,
+            'order_currency': self.order.currency,
+            'order_amount': 1.0,
+            'amount': 1.0,
+            'pay_for': self.order.pk,
+            'balance_amount': 1.0,
+            'paid_amount': 1.0,
+            'paymentDateTime': now().isoformat(),
+            'onpay_id': ONPAY_ID,
+            'balance_currency': self.order.currency,
+            'exchange_rate': 1,
+            'user_email': 'bender@ilovebender.com'
+        }
 
     def assertOrderSuccessfullyPaid(self, order):
         self.assertTrue(
