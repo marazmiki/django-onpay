@@ -109,7 +109,6 @@ class TestViews(test.TestCase):
         resp = self.client.post(self.url, data=data)
         self.assertEquals(400, resp.status_code)
         self.assertOrderFailed(self.order)
-        #@ TODO signals?
 
 
 class TestUtils(test.TestCase):
