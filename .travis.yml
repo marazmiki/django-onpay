@@ -1,0 +1,26 @@
+language: python
+
+python:
+  - "2.7"
+  - "3.3"
+
+env:
+  - DJANGO=1.5.9
+  - DJANGO=1.6.6
+
+install:
+  - pip install -q Django==$DJANGO
+  - pip install -q requests
+  - pip install -q flake8
+  - pip install -q python-coveralls coverage
+  - python setup.py install
+
+
+before_script:
+  - flake8 --exclude=migrations --ignore=W391,E501,E225 onpay
+
+after_success:
+  coveralls --config_file=coverage.rc
+
+script:
+  - coverage run --include=onpay/* python setup.py test
