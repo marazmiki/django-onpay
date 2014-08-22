@@ -9,16 +9,19 @@ from django.core.urlresolvers import reverse_lazy
 from django.utils import six
 from django.utils.timezone import now
 from onpay.utils import create_order
+from onpay import signals
 
 
 # Some constants
 ONPAY_ID = '123'
-# CRC_PAY_CORRECT = 'F465AABBFE55757B97C9D7C0AD185D98'
 CRC_PAY_CORRECT = '5C89A599E3E15DE4E3EC2803DC0BF596'
-# CRC_PAY_CREATE = '1F427A926317875FB470268551298410'
 CRC_PAY_CREATE = 'BEAC0AA488C13E9B89B5F8B8DA425F5C'
 CRC_CHECK_CORRECT = '48CE93AD7E0053BA37316676F4B29C4A'
 CRC_CHECK_CREATE = '8E1D15E585D02885B40BA7E69C7572FF'
+
+
+def signal_catcher(*args, **kwargs):
+    raise ZeroDivisionError
 
 
 class TestViews(test.TestCase):
@@ -55,8 +58,25 @@ class TestViews(test.TestCase):
                 'exchange_rate': 1,
                 'user_email': 'bender@ilovebender.com'}
 
+    def assertOrderSuccessfullyPaid(self, order):
+        self.assertTrue(
+            order.__class__.objects.get(pk=order.pk).is_successfully_paid()
+        )
+
+    def assertOrderFailed(self, order):
+        self.assertFalse(
+            order.__class__.objects.get(pk=order.pk).is_successfully_paid()
+        )
+
     def test_bad_request(self):
         resp = self.client.post(self.url)
+        self.assertEquals(400, resp.status_code)
+
+    def test_bad_request_pay_wrong_date(self):
+        data = self.get_pay_data()
+        data.update(paymentDateTime='not-a-timestamp')
+        del data['type']  # wittingly invalid form
+        resp = self.client.post(self.url, data=data)
         self.assertEquals(400, resp.status_code)
 
     def test_check_form_valid(self):
@@ -67,27 +87,29 @@ class TestViews(test.TestCase):
         self.assertContains(resp, CRC_CHECK_CREATE)
 
     def test_check_form_valid_md5_failed(self):
-        resp = self.client.post(self.url, data=self.get_check_data())
+        data = self.get_check_data()
+        data.update(md5='*****')
+        resp = self.client.post(self.url, data=data)
         self.assertEquals(400, resp.status_code)
         self.assertIn('failed', resp.content)
 
     def test_pay_form_valid(self):
-        resp = self.client.post(self.url, data=self.get_pay_data())
+        data = self.get_pay_data()
+        data.update(md5=CRC_PAY_CORRECT)
+        resp = self.client.post(self.url, data=data)
+
         self.assertEquals(200, resp.status_code)
         self.assertContains(resp, '<comment>OK</comment>')
-        self.assertContains(resp, CRC_CHECK_CREATE)
+        self.assertContains(resp, CRC_PAY_CREATE)
+        self.assertOrderSuccessfullyPaid(self.order)
 
-    # balance_amount = forms.FloatField()
-    # paid_amount = forms.FloatField()
-    # paymentDateTime = forms.CharField()
-    # onpay_id = forms.IntegerField()
-    # user_phone = forms.CharField(required=False)
-    # balance_currency = forms.ChoiceField(choices=CURRENCY_CHOICES)
-    # note = forms.CharField(required=False)
-    # exchange_rate = forms.FloatField()
-    # protection_code = forms.CharField(required=False)
-    # day_to_expiry = forms.CharField(required=False)
-    # user_email = forms.EmailField()
+    def test_pay_form_valid_md5_failed(self):
+        data = self.get_pay_data()
+        data.update(md5='NOT_' + CRC_PAY_CORRECT)
+        resp = self.client.post(self.url, data=data)
+        self.assertEquals(400, resp.status_code)
+        self.assertOrderFailed(self.order)
+        #@ TODO signals?
 
 
 class TestUtils(test.TestCase):
@@ -137,7 +159,14 @@ class TestModels(test.TestCase):
         self.assertEquals(self.order.STATE_SUCCESS, self.order.state)
 
     def test_mark_as_success_signal(self):
-        self.skipTest('Not implemented')
+        signals.order_success.connect(signal_catcher)
+        try:
+            self.order.mark_as_success()
+            self.fail('Signal are not sent')
+        except ZeroDivisionError:
+            pass
+        finally:
+            signals.order_success.disconnect(signal_catcher)
 
     def test_mark_as_failure(self):
         self.order.mark_as_failure()
@@ -145,7 +174,14 @@ class TestModels(test.TestCase):
                           self.order.state)
 
     def test_mark_as_failure_signal(self):
-        self.skipTest('Not implemented')
+        signals.order_failure.connect(signal_catcher)
+        try:
+            self.order.mark_as_failure()
+            self.fail('Signal are not sent')
+        except ZeroDivisionError:
+            ""
+        finally:
+            signals.order_failure.disconnect(signal_catcher)
 
     def test_can_be_payed(self):
         self.assertTrue(self.order.can_be_payed())

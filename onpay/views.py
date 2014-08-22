@@ -56,5 +56,4 @@ def result(request):
             return HttpResponse(result_xml, content_type='text/xml')
 
         else:
-            logger.debug('check failed')
             return HttpResponseBadRequest('Check failed')
