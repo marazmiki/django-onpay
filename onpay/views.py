@@ -34,10 +34,11 @@ def result(request):
             md5_checksum = po.crc_pay_create(order_amount=order_amount,
                                              onpay_id=onpay_id)
 
-            result_xml = render_to_string('onpay/pay_success.xml', {'onpay_id': onpay_id,
-                                                                    'pay_for': po.id,
-                                                                    'order_id': po.id,
-                                                                    'md5_checksum': md5_checksum})
+            result_xml = render_to_string('onpay/pay_success.xml',
+                                          {'onpay_id': onpay_id,
+                                           'pay_for': po.id,
+                                           'order_id': po.id,
+                                           'md5_checksum': md5_checksum})
             po.mark_as_success()
             return HttpResponse(result_xml, content_type='text/xml')
 
@@ -49,8 +50,9 @@ def result(request):
 
         if order.crc_check_correct(check_form.cleaned_data['md5']):
             md5_checksum = order.crc_check_create()
-            result_xml = render_to_string('onpay/check_success.xml', {'md5_checksum': md5_checksum,
-                                                                      'pay_for': order.id})
+            result_xml = render_to_string('onpay/check_success.xml',
+                                          {'md5_checksum': md5_checksum,
+                                           'pay_for': order.id})
             return HttpResponse(result_xml, content_type='text/xml')
 
         else:

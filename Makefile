@@ -5,7 +5,7 @@ release:
 	python setup.py sdist --format=zip,bztar,gztar register upload
 
 flake8:
-	flake8 --ignore=E501,W292 --max-complexity 12 onpay
+	flake8 --max-complexity 12 onpay
 
 coverage:
 	coverage run --include=onpay/* setup.py test

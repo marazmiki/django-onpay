@@ -10,7 +10,8 @@ from onpay.models import Order
 
 class OrderAdmin(admin.ModelAdmin):
     list_filter = ['state']
-    list_display = ['id', 'comment', 'amount', 'email', 'date_created', 'state']
     date_hierarchy = 'date_created'
+    list_display = ['id', 'comment', 'amount', 'email',
+                    'date_created', 'state']
 
 admin.site.register(Order, OrderAdmin)

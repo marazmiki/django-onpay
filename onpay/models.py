@@ -8,7 +8,8 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from onpay import settings
-from onpay.signals import order_created, order_updated, order_success, order_failure
+from onpay.signals import (order_created, order_updated,
+                           order_success, order_failure)
 import hashlib
 import urllib
 
@@ -61,13 +62,14 @@ class Order(models.Model):
     def is_pay_failed(self):
         return self.state in [self.STATE_EXPIRED, self.STATE_FAILURE]
 
-    def get_pay_url(self, currency=settings.ONPAY_CURRENCY, success_url=settings.ONPAY_SUCCESS_URL,
+    def get_pay_url(self, currency=settings.ONPAY_CURRENCY,
+                    success_url=settings.ONPAY_SUCCESS_URL,
                     failure_url=settings.ONPAY_SUCCESS_URL):
-        md5_str = 'fix;{amount:.1f};{currency};{order_id:d};no;{secret}'.format(
-            amount=self.amount,
-            currency=settings.ONPAY_CURRENCY,
-            secret=settings.ONPAY_SECRET,
-            order_id=self.id)
+        pattern = 'fix;{amount:.1f};{currency};{order_id:d};no;{secret}'
+        md5_str = pattern.format(amount=self.amount,
+                                 currency=settings.ONPAY_CURRENCY,
+                                 secret=settings.ONPAY_SECRET,
+                                 order_id=self.id)
         md5 = hashlib.md5(md5_str).hexdigest()
 
         return settings.ONPAY_GATE_URL + '?' + urllib.urlencode({
@@ -92,12 +94,12 @@ class Order(models.Model):
         signal.send(sender=self.__class__, order=self)
 
     def _check(self, flag=''):
-        raw_string = 'check;{order_id};{amount:.1f};{currency};{flag}{secret}'.format(
-            order_id=self.id,
-            amount=self.amount,
-            currency=settings.ONPAY_CURRENCY,
-            secret=settings.ONPAY_SECRET,
-            flag=flag)
+        pattern = 'check;{order_id};{amount:.1f};{currency};{flag}{secret}'
+        raw_string = pattern.format(order_id=self.id,
+                                    amount=self.amount,
+                                    currency=settings.ONPAY_CURRENCY,
+                                    secret=settings.ONPAY_SECRET,
+                                    flag=flag)
         hashed_string = hashlib.md5(raw_string).hexdigest().upper()
         return hashed_string
 
@@ -112,29 +114,30 @@ class Order(models.Model):
 
     def crc_pay_correct(self, crc, onpay_id, order_amount):
         actual_crc = self.crc_pay_get(onpay_id, order_amount)
-        #print("expected crc: %s, actual: %s" % (crc, actual_crc))
+        # print("expected crc: %s, actual: %s" % (crc, actual_crc))
         return crc == actual_crc
 
     def crc_pay_get(self, onpay_id, order_amount):
-        md5source = 'pay;{order_id};{onpay_id};{order_amount};{currency};{secret}'.format(
-            order_id=self.id,
-            onpay_id=onpay_id,
-            order_amount=order_amount,
-            currency=settings.ONPAY_CURRENCY,
-            secret=settings.ONPAY_SECRET)
-        #print('crc get =',md5source)
+        pattern = ('pay;{order_id};{onpay_id};{order_amount};'
+                   '{currency};{secret}')
+        md5source = pattern.format(order_id=self.id,
+                                   onpay_id=onpay_id,
+                                   order_amount=order_amount,
+                                   currency=settings.ONPAY_CURRENCY,
+                                   secret=settings.ONPAY_SECRET)
+        # print('crc get =',md5source)
         md5hash = hashlib.md5(md5source).hexdigest().upper()
         return md5hash
 
     def crc_pay_create(self, onpay_id, order_amount):
-        result_m5source = 'pay;{po:d};{onpay_id};{order_id:d};{order_amount};{currency};0;{secret}'.format(
-            po=self.id,
-            onpay_id=onpay_id,
-            order_id=self.id,
-            order_amount=order_amount,
-            currency=settings.ONPAY_CURRENCY,
-            secret=settings.ONPAY_SECRET,
-        )
+        pattern = ('pay;{po:d};{onpay_id};{order_id:d};{order_amount};'
+                   '{currency};0;{secret}')
+        result_m5source = pattern.format(po=self.id,
+                                         onpay_id=onpay_id,
+                                         order_id=self.id,
+                                         order_amount=order_amount,
+                                         currency=settings.ONPAY_CURRENCY,
+                                         secret=settings.ONPAY_SECRET)
         result_m5hash = hashlib.md5(result_m5source).hexdigest().upper()
         return result_m5hash
 
@@ -165,5 +168,7 @@ def mode_trigger(**kwargs):
         instance.mode = instance.MODE_TEST
 
 
-models.signals.pre_save.connect(mode_trigger, sender=Order, dispatch_uid='onpay.models')
-models.signals.post_save.connect(order_trigger, sender=Order, dispatch_uid='onpay.models')
+models.signals.pre_save.connect(mode_trigger, sender=Order,
+                                dispatch_uid='onpay.models')
+models.signals.post_save.connect(order_trigger, sender=Order,
+                                 dispatch_uid='onpay.models')

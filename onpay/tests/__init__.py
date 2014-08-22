@@ -32,47 +32,47 @@ class TestViews(test.TestCase):
         self.client = test.Client()
         self.url = reverse_lazy('onpay_result')
 
+    def get_check_data(self):
+        return {'type': 'check',
+                'md5': CRC_CHECK_CORRECT,
+                'order_currency': self.order.currency,
+                'order_amount': 1.0,
+                'amount': 1.0,
+                'pay_for': self.order.pk}
+
+    def get_pay_data(self):
+        return {'type': 'pay',
+                'md5': CRC_CHECK_CORRECT,
+                'order_currency': self.order.currency,
+                'order_amount': 1.0,
+                'amount': 1.0,
+                'pay_for': self.order.pk,
+                'balance_amount': 1.0,
+                'paid_amount': 1.0,
+                'paymentDateTime': now().isoformat(),
+                'onpay_id': ONPAY_ID,
+                'balance_currency': self.order.currency,
+                'exchange_rate': 1,
+                'user_email': 'bender@ilovebender.com'}
+
     def test_bad_request(self):
         resp = self.client.post(self.url)
         self.assertEquals(400, resp.status_code)
 
     def test_check_form_valid(self):
-        resp = self.client.post(self.url, data={'type': 'check',
-                                                'md5': CRC_CHECK_CORRECT,
-                                                'order_currency': self.order.currency,
-                                                'order_amount': 1.0,
-                                                'amount': 1.0,
-                                                'pay_for': self.order.pk})
+        resp = self.client.post(self.url, self.get_check_data())
 
         self.assertEquals(200, resp.status_code)
         self.assertContains(resp, '<comment>OK</comment>')
         self.assertContains(resp, CRC_CHECK_CREATE)
 
     def test_check_form_valid_md5_failed(self):
-        resp = self.client.post(self.url, data={'type': 'check',
-                                                'md5': 'NOT_' + CRC_CHECK_CORRECT,
-                                                'order_currency': self.order.currency,
-                                                'order_amount': 1.0,
-                                                'amount': 1.0,
-                                                'pay_for': self.order.pk})
+        resp = self.client.post(self.url, data=self.get_check_data())
         self.assertEquals(400, resp.status_code)
         self.assertIn('failed', resp.content)
 
     def test_pay_form_valid(self):
-        resp = self.client.post(self.url, data={'type': 'pay',
-                                                'md5': CRC_CHECK_CORRECT,
-                                                'order_currency': self.order.currency,
-                                                'order_amount': 1.0,
-                                                'amount': 1.0,
-                                                'pay_for': self.order.pk,
-                                                'balance_amount': 1.0,
-                                                'paid_amount': 1.0,
-                                                'paymentDateTime': now().isoformat(),
-                                                'onpay_id': ONPAY_ID,
-                                                'balance_currency': self.order.currency,
-                                                'exchange_rate': 1,
-                                                'user_email': 'bender@ilovebender.com'
-                                                })
+        resp = self.client.post(self.url, data=self.get_pay_data())
         self.assertEquals(200, resp.status_code)
         self.assertContains(resp, '<comment>OK</comment>')
         self.assertContains(resp, CRC_CHECK_CREATE)
@@ -105,20 +105,25 @@ class TestUtils(test.TestCase):
         self.assertEquals(order.STATE_WAITING, order.state)
 
     def test_create_order_with_tst_currency(self):
-        order = create_order(amount=10, currency='TST', comment='Test order', email='bender@ilovebender.com')
+        order = create_order(amount=10, currency='TST', comment='Test order',
+                             email='bender@ilovebender.com')
         self.assertEquals('TST', order.currency)
         self.assertEquals(order.MODE_TEST, order.mode)
 
     def test_create_order_with_unknown_currency(self):
-        self.assertRaises(TypeError, lambda: create_order(amount=10,
-                                                          currency='WTF',
-                                                          comment='Test order',
-                                                          email='bender@ilovebender.com'))
+        def raised_exception():
+            create_order(amount=10,
+                         currency='WTF',
+                         comment='Test order',
+                         email='bender@ilovebender.com')
+        self.assertRaises(TypeError, raised_exception)
 
 
 class TestModels(test.TestCase):
     def create_order(self):
-        return create_order(amount=10, currency='RUR', comment='Test order', email='bender@ilovebender.com')
+        return create_order(amount=10, currency='RUR',
+                            comment='Test order',
+                            email='bender@ilovebender.com')
 
     def setUp(self):
         self.order = self.create_order()
@@ -147,7 +152,9 @@ class TestModels(test.TestCase):
 
     def test_can_be_payed_not(self):
         order = self.order
-        for state in [order.STATE_FAILURE, order.STATE_SUCCESS, order.STATE_EXPIRED]:
+        for state in [order.STATE_FAILURE,
+                      order.STATE_SUCCESS,
+                      order.STATE_EXPIRED]:
             order.state = state
             order.save()
             self.assertFalse(order.can_be_payed())
@@ -159,7 +166,9 @@ class TestModels(test.TestCase):
 
     def test_is_successfully_paid_not(self):
         order = self.order
-        for state in [order.STATE_FAILURE, order.STATE_WAITING, order.STATE_EXPIRED]:
+        for state in [order.STATE_FAILURE,
+                      order.STATE_WAITING,
+                      order.STATE_EXPIRED]:
             order.state = state
             order.save()
             self.assertFalse(order.is_successfully_paid())
@@ -187,10 +196,14 @@ class TestModels(test.TestCase):
         self.assertTrue(self.order.crc_check_correct(CRC_CHECK_CORRECT))
 
     def test_crc_check_correct_not(self):
-        self.assertFalse(self.order.crc_check_correct('NOT_' + CRC_CHECK_CORRECT))
+        self.assertFalse(
+            self.order.crc_check_correct('NOT_' + CRC_CHECK_CORRECT)
+        )
 
     def test_crc_check_create(self):
-        self.assertEquals(CRC_CHECK_CREATE, self.order.crc_check_create())
+        self.assertEquals(
+            CRC_CHECK_CREATE, self.order.crc_check_create()
+        )
 
     def test_crc_pay_correct(self):
         self.assertTrue(self.order.crc_pay_correct(crc=CRC_PAY_CORRECT,
@@ -198,9 +211,11 @@ class TestModels(test.TestCase):
                                                    order_amount=1.0))
 
     def test_crc_pay_correct_not(self):
-        self.assertFalse(self.order.crc_pay_correct(crc='NOT_' + CRC_PAY_CORRECT,
-                                                    onpay_id=ONPAY_ID,
-                                                    order_amount=1.0))
+        self.assertFalse(
+            self.order.crc_pay_correct(crc='NOT_' + CRC_PAY_CORRECT,
+                                       onpay_id=ONPAY_ID,
+                                       order_amount=1.0)
+        )
 
     def test_crc_pay_get(self):
         self.assertEquals(CRC_PAY_CORRECT,
@@ -208,5 +223,7 @@ class TestModels(test.TestCase):
                                                  order_amount=1.0))
 
     def test_crc_pay_create(self):
-        self.assertEquals(CRC_PAY_CREATE, self.order.crc_pay_create(onpay_id=ONPAY_ID,
-                                                                    order_amount=1.0))
+        self.assertEquals(
+            CRC_PAY_CREATE,
+            self.order.crc_pay_create(onpay_id=ONPAY_ID,
+                                      order_amount=1.0))

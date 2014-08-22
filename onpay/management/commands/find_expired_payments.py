@@ -15,4 +15,6 @@ class Command(NoArgsCommand):
         today = now()
         limit = today - datetime.timedelta(seconds=60 * 60)
 
-        Order.objects.filter(date_created__lte=limit).update(state=Order.STATE_EXPIRED)
+        Order.objects.filter(
+            date_created__lte=limit
+        ).update(state=Order.STATE_EXPIRED)
