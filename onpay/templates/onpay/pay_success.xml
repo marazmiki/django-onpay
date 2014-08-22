@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<result>
+    <code>0</code>
+    <comment>OK</comment>
+    <onpay_id>{{ onpay_id }}</onpay_id>
+    <pay_for>{{ pay_for }}</pay_for>
+    <order_id>{{ order_id }}</order_id>
+    <md5>{{ md5_checksum }}</md5>
+</result>
