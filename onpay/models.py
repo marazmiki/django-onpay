@@ -12,7 +12,6 @@ from onpay import settings
 from onpay.signals import (order_created, order_updated,
                            order_success, order_failure)
 import hashlib
-import urllib
 
 
 try:
