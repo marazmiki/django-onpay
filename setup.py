@@ -37,7 +37,7 @@ setup(
     version=version,
     author_email='marazmiki@gmail.com',
     url='http://pypi.python.org/pypi/django-onpay',
-    download_url='http://bitbucket.org/marazmiki/django-ulogin/get/tip.zip',
+    download_url='http://bitbucket.org/marazmiki/django-onpay/get/tip.zip',
     description='onpay',
     long_description=open(readme).read(),
     license='MIT license',

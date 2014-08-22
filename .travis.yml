@@ -10,17 +10,15 @@ env:
 
 install:
   - pip install -q Django==$DJANGO
-  - pip install -q requests
   - pip install -q flake8
   - pip install -q python-coveralls coverage
   - python setup.py install
-
 
 before_script:
   - make flake8
 
 after_success:
-  - coveralls --config_file=coverage.rc
+  - make coveralls
 
 script:
   - make coverage
