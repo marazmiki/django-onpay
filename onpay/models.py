@@ -15,6 +15,12 @@ import hashlib
 import urllib
 
 
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
+
+
 @python_2_unicode_compatible
 class Order(models.Model):
     MODE_LIVE = 0
@@ -72,7 +78,7 @@ class Order(models.Model):
             md5_str = md5_str.encode('utf-8')
         md5 = hashlib.md5(md5_str).hexdigest()
 
-        return settings.ONPAY_GATE_URL + '?' + urllib.urlencode({
+        return settings.ONPAY_GATE_URL + '?' + urlencode({
             'pay_mode': 'fix',
             'f': 7,
             'price': self.amount,
