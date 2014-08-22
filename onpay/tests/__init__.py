@@ -150,6 +150,16 @@ class TestModels(test.TestCase):
                             comment='Test order',
                             email='bender@ilovebender.com')
 
+    def assertSignalCatched(self, signal, callable_, ):
+        signal.connect(signal_catcher)
+        try:
+            callable_()
+            self.fail('Signal are not sent')
+        except ZeroDivisionError:
+            pass
+        finally:
+            signal.disconnect(signal_catcher)
+
     def setUp(self):
         self.order = self.create_order()
 
@@ -162,14 +172,7 @@ class TestModels(test.TestCase):
         self.assertEquals(self.order.STATE_SUCCESS, self.order.state)
 
     def test_mark_as_success_signal(self):
-        signals.order_success.connect(signal_catcher)
-        try:
-            self.order.mark_as_success()
-            self.fail('Signal are not sent')
-        except ZeroDivisionError:
-            pass
-        finally:
-            signals.order_success.disconnect(signal_catcher)
+        self.assertSignalCatched(signals.order_success, lambda: self.order.mark_as_success())
 
     def test_mark_as_failure(self):
         self.order.mark_as_failure()
@@ -177,14 +180,7 @@ class TestModels(test.TestCase):
                           self.order.state)
 
     def test_mark_as_failure_signal(self):
-        signals.order_failure.connect(signal_catcher)
-        try:
-            self.order.mark_as_failure()
-            self.fail('Signal are not sent')
-        except ZeroDivisionError:
-            ""
-        finally:
-            signals.order_failure.disconnect(signal_catcher)
+        self.assertSignalCatched(signals.order_failure, lambda: self.order.mark_as_failure())
 
     def test_can_be_payed(self):
         self.assertTrue(self.order.can_be_payed())

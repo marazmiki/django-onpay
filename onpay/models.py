@@ -40,8 +40,7 @@ class Order(models.Model):
                                     (STATE_WAITING, _('Waiting')),
                                     (STATE_EXPIRED, _('Expired')),
                                 ))
-    mode = models.IntegerField(_('mode'),
-                               default=MODE_LIVE,
+    mode = models.IntegerField(_('mode'), default=MODE_LIVE,
                                choices=(
                                    (MODE_LIVE, _('live')),
                                    (MODE_TEST, _('text')),
