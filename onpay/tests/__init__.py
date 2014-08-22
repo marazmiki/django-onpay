@@ -5,7 +5,6 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
 from django import test
-from django.conf.urls import url
 from django.core.urlresolvers import reverse_lazy
 from django.utils import six
 from django.utils.timezone import now
@@ -20,7 +19,6 @@ CRC_PAY_CORRECT = '5C89A599E3E15DE4E3EC2803DC0BF596'
 CRC_PAY_CREATE = 'BEAC0AA488C13E9B89B5F8B8DA425F5C'
 CRC_CHECK_CORRECT = '48CE93AD7E0053BA37316676F4B29C4A'
 CRC_CHECK_CREATE = '8E1D15E585D02885B40BA7E69C7572FF'
-
 
 
 class TestViews(test.TestCase):
@@ -44,7 +42,7 @@ class TestViews(test.TestCase):
                                                 'order_currency': self.order.currency,
                                                 'order_amount': 1.0,
                                                 'amount': 1.0,
-                                                'pay_for': self.order.pk,})
+                                                'pay_for': self.order.pk})
 
         self.assertEquals(200, resp.status_code)
         self.assertContains(resp, '<comment>OK</comment>')
@@ -56,7 +54,7 @@ class TestViews(test.TestCase):
                                                 'order_currency': self.order.currency,
                                                 'order_amount': 1.0,
                                                 'amount': 1.0,
-                                                'pay_for': self.order.pk,})
+                                                'pay_for': self.order.pk})
         self.assertEquals(400, resp.status_code)
         self.assertIn('failed', resp.content)
 
@@ -79,8 +77,6 @@ class TestViews(test.TestCase):
         self.assertContains(resp, '<comment>OK</comment>')
         self.assertContains(resp, CRC_CHECK_CREATE)
 
-
-
     # balance_amount = forms.FloatField()
     # paid_amount = forms.FloatField()
     # paymentDateTime = forms.CharField()
@@ -92,6 +88,7 @@ class TestViews(test.TestCase):
     # protection_code = forms.CharField(required=False)
     # day_to_expiry = forms.CharField(required=False)
     # user_email = forms.EmailField()
+
 
 class TestUtils(test.TestCase):
     def test_create_order_full(self):
@@ -213,5 +210,3 @@ class TestModels(test.TestCase):
     def test_crc_pay_create(self):
         self.assertEquals(CRC_PAY_CREATE, self.order.crc_pay_create(onpay_id=ONPAY_ID,
                                                                     order_amount=1.0))
-
-
