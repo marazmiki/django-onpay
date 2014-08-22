@@ -33,15 +33,13 @@ class Order(models.Model):
     email = models.EmailField(_('buyer e-mail'))
     date_created = models.DateTimeField(_('created at'), auto_now_add=True)
     state = models.IntegerField(_('order status'),
-                                default=STATE_WAITING,
-                                choices=(
+                                default=STATE_WAITING, choices=(
                                     (STATE_SUCCESS, _('Success')),
                                     (STATE_FAILURE, _('Failed')),
                                     (STATE_WAITING, _('Waiting')),
                                     (STATE_EXPIRED, _('Expired')),
                                 ))
-    mode = models.IntegerField(_('mode'), default=MODE_LIVE,
-                               choices=(
+    mode = models.IntegerField(_('mode'), default=MODE_LIVE, choices=(
                                    (MODE_LIVE, _('live')),
                                    (MODE_TEST, _('text')),
                                ))

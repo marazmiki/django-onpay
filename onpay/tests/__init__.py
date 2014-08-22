@@ -172,7 +172,8 @@ class TestModels(test.TestCase):
         self.assertEquals(self.order.STATE_SUCCESS, self.order.state)
 
     def test_mark_as_success_signal(self):
-        self.assertSignalCatched(signals.order_success, lambda: self.order.mark_as_success())
+        self.assertSignalCatched(signals.order_success,
+                                 lambda: self.order.mark_as_success())
 
     def test_mark_as_failure(self):
         self.order.mark_as_failure()
@@ -180,7 +181,8 @@ class TestModels(test.TestCase):
                           self.order.state)
 
     def test_mark_as_failure_signal(self):
-        self.assertSignalCatched(signals.order_failure, lambda: self.order.mark_as_failure())
+        self.assertSignalCatched(signals.order_failure,
+                                 lambda: self.order.mark_as_failure())
 
     def test_can_be_payed(self):
         self.assertTrue(self.order.can_be_payed())
