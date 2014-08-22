@@ -17,10 +17,10 @@ install:
 
 
 before_script:
-  - flake8 --exclude=migrations --ignore=W391,E501,E225 onpay
+  - make flake8
 
 after_success:
-  coveralls --config_file=coverage.rc
+  - coveralls --config_file=coverage.rc
 
 script:
   - coverage run --include=onpay/* python setup.py test

@@ -11,6 +11,10 @@ coverage:
 	coverage run --include=onpay/* setup.py test
 	coverage html
 
+coveralls:
+	coveralls --config_file=coverage.rc
+
+
 clean:
 	rm -rf *.egg *.egg-info
 	rm -rf htmlcov
