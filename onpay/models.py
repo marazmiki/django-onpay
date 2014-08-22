@@ -7,6 +7,7 @@ from __future__ import division
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+from django.utils import six
 from onpay import settings
 from onpay.signals import (order_created, order_updated,
                            order_success, order_failure)
@@ -67,6 +68,8 @@ class Order(models.Model):
                                  currency=settings.ONPAY_CURRENCY,
                                  secret=settings.ONPAY_SECRET,
                                  order_id=self.id)
+        if six.PY3:
+            md5_str = md5_str.encode('utf-8')
         md5 = hashlib.md5(md5_str).hexdigest()
 
         return settings.ONPAY_GATE_URL + '?' + urllib.urlencode({
@@ -97,6 +100,8 @@ class Order(models.Model):
                                     currency=settings.ONPAY_CURRENCY,
                                     secret=settings.ONPAY_SECRET,
                                     flag=flag)
+        if six.PY3:
+            raw_string = raw_string.encode('utf-8')
         hashed_string = hashlib.md5(raw_string).hexdigest().upper()
         return hashed_string
 
@@ -122,7 +127,8 @@ class Order(models.Model):
                                    order_amount=order_amount,
                                    currency=settings.ONPAY_CURRENCY,
                                    secret=settings.ONPAY_SECRET)
-        # print('crc get =',md5source)
+        if six.PY3:
+            md5source = md5source.encode('utf-8')
         md5hash = hashlib.md5(md5source).hexdigest().upper()
         return md5hash
 
@@ -135,6 +141,8 @@ class Order(models.Model):
                                          order_amount=order_amount,
                                          currency=settings.ONPAY_CURRENCY,
                                          secret=settings.ONPAY_SECRET)
+        if six.PY3:
+            result_m5source = result_m5source.encode('utf-8')
         result_m5hash = hashlib.md5(result_m5source).hexdigest().upper()
         return result_m5hash
 
