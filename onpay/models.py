@@ -12,7 +12,12 @@ from onpay import settings
 from onpay.signals import (order_created, order_updated,
                            order_success, order_failure)
 import hashlib
-import urllib
+
+
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
 
 
 def md5(src):
@@ -78,7 +83,7 @@ class Order(models.Model):
             md5_str = md5_str.encode('utf-8')
         md5 = hashlib.md5(md5_str).hexdigest()
 
-        return settings.ONPAY_GATE_URL + '?' + urllib.urlencode({
+        return settings.ONPAY_GATE_URL + '?' + urlencode({
             'pay_mode': 'fix',
             'f': 7,
             'price': self.amount,
