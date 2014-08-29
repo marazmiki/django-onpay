@@ -15,6 +15,12 @@ import hashlib
 import urllib
 
 
+def md5(src):
+    if six.PY3:
+        src = src.encode('utf-8')
+    return hashlib.md5(src).hexdigest().upper()
+
+
 @python_2_unicode_compatible
 class Order(models.Model):
     MODE_LIVE = 0
@@ -100,9 +106,7 @@ class Order(models.Model):
                                     currency=settings.ONPAY_CURRENCY,
                                     secret=settings.ONPAY_SECRET,
                                     flag=flag)
-        if six.PY3:
-            raw_string = raw_string.encode('utf-8')
-        hashed_string = hashlib.md5(raw_string).hexdigest().upper()
+        hashed_string = md5(raw_string)
         return hashed_string
 
     def crc_check_correct(self, crc):
@@ -116,7 +120,6 @@ class Order(models.Model):
 
     def crc_pay_correct(self, crc, onpay_id, order_amount):
         actual_crc = self.crc_pay_get(onpay_id, order_amount)
-        # print("expected crc: %s, actual: %s" % (crc, actual_crc))
         return crc == actual_crc
 
     def crc_pay_get(self, onpay_id, order_amount):
@@ -127,9 +130,7 @@ class Order(models.Model):
                                    order_amount=order_amount,
                                    currency=settings.ONPAY_CURRENCY,
                                    secret=settings.ONPAY_SECRET)
-        if six.PY3:
-            md5source = md5source.encode('utf-8')
-        md5hash = hashlib.md5(md5source).hexdigest().upper()
+        md5hash = md5(md5source)
         return md5hash
 
     def crc_pay_create(self, onpay_id, order_amount):
@@ -141,9 +142,7 @@ class Order(models.Model):
                                          order_amount=order_amount,
                                          currency=settings.ONPAY_CURRENCY,
                                          secret=settings.ONPAY_SECRET)
-        if six.PY3:
-            result_m5source = result_m5source.encode('utf-8')
-        result_m5hash = hashlib.md5(result_m5source).hexdigest().upper()
+        result_m5hash = md5(result_m5source)
         return result_m5hash
 
     def __str__(self):
