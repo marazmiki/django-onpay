@@ -11,8 +11,9 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 
 settings.configure(
-    DEBUG=True,
-    ROOT_URLCONF='django_ulogin.tests.urls',
+    DEBUG=False,
+    ROOT_URLCONF='onpay.urls',
+    MIDDLEWARE_CLASSES=(),
     INSTALLED_APPS=(
         'django.contrib.auth',
         'django.contrib.contenttypes',
@@ -29,6 +30,10 @@ settings.configure(
 
 def main():
     from django.test.utils import get_runner
+    import django
+
+    if hasattr(django, 'setup'):
+        django.setup()
 
     find_pattern = 'onpay'
 

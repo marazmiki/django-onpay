@@ -1,7 +1,7 @@
 django-onpay
 ============
 
-.. image:: https://badge.fury.io/py/django-ulogin.png
+.. image:: https://badge.fury.io/py/django-onpay.png
     :target: http://badge.fury.io/py/django-onpay
 
 .. image:: https://travis-ci.org/marazmiki/django-onpay.png?branch=master
@@ -12,3 +12,13 @@ django-onpay
 
 .. image:: https://pypip.in/d/django-onpay/badge.png
         :target: https://pypi.python.org/pypi/django-onpay
+
+.. image:: https://pypip.in/d/django-onpay/badge.png
+    :target: https://pypi.python.org/pypi/django-onpay
+    :alt: Latest version on PyPI
+
+.. image:: https://pypip.in/wheel/django-onpay/badge.svg
+    :target: https://pypi.python.org/pypi/django-onpay/
+    :alt: Wheel Status
+
+

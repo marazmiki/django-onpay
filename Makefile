@@ -3,12 +3,13 @@ test:
 
 release:
 	python setup.py sdist --format=zip,bztar,gztar register upload
+	python setup.py bdist_wheel register upload
 
 flake8:
-	flake8 --max-complexity 12 --ignore=E126,E501 onpay
+	flake8 onpay
 
 coverage:
-	coverage run --include=onpay/* setup.py test
+	coverage run --rcfile=.coveragerc --include=onpay/* setup.py test
 	coverage html
 
 coveralls:

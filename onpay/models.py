@@ -51,12 +51,12 @@ class Order(models.Model):
                                     (STATE_FAILURE, _('Failed')),
                                     (STATE_WAITING, _('Waiting')),
                                     (STATE_EXPIRED, _('Expired')),
-                                ))
+                                    ))
     mode = models.IntegerField(_('mode'), default=MODE_LIVE,
                                choices=(
                                    (MODE_LIVE, _('live')),
                                    (MODE_TEST, _('text')),
-                               ))
+                                   ))
 
     def mark_as_success(self):
         self._mark(state=self.STATE_SUCCESS, signal=order_success)

@@ -44,5 +44,5 @@ class PayForm(CheckForm):
     def clean_paymentDateTime(self):
         try:
             return parse(self.cleaned_data['paymentDateTime'])
-        except TypeError:
+        except (ValueError, TypeError):
             raise forms.ValidationError('Wrong paymentDateTime value')
