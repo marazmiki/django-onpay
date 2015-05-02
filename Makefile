@@ -6,7 +6,7 @@ release:
 	python setup.py bdist_wheel register upload
 
 flake8:
-	flake8 onpay
+	flake8 onpay setup.py tests.py
 
 coverage:
 	coverage run --rcfile=.coveragerc --include=onpay/* setup.py test
