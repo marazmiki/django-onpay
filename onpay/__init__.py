@@ -7,4 +7,4 @@ from __future__ import division
 
 
 def get_version():
-    return '0.2'
+    return '0.2.1'
