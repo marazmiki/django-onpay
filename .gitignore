@@ -3,3 +3,5 @@ htmlcov/
 *.pyc
 *.egg
 *.egg-info
+build/
+dist/
