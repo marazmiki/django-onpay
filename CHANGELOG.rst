@@ -1,3 +1,8 @@
+0.0.2
+-----
+
+* Updated head version of Django (1.8.2)
+
 0.2.1
 -----
 
